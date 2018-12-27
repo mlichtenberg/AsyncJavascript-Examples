@@ -1,0 +1,131 @@
+<html>
+    <body>
+        <div>
+            <input type="button" onclick="fetchData();" value="Fetch" id="fetchButton" name="fetchButton"/>
+            <input type="button" onclick="callPromise();" value="Promise" id="promiseButton" name="promiseButton"/>
+            <input type="button" onclick="invokeAsync();" value="Async/Await" id="asyncButton" name="asyncButton"/>
+            <input type="button" onclick="clearOutput();" value="Clear" id="clearButton" name="clearButton"/>
+        </div>
+        <div>
+            <div id="outputDiv" name="outputDiv"></div>
+        </div>
+
+        <script type="text/javascript">
+			var url = "https://aws.random.cat/meow";
+			/* Returns a response that looks like this:
+				{
+					"file": "https://purr.objects-us-east-1.dream.io/i/7mvSR.gif"
+				}
+			*/
+
+            /*
+             EXAMPLE OF A FETCH OPERATION
+            */
+            var fetchData = function () {
+                if (self.fetch)
+                {
+                    this.showOutput("<br/>About to fetch");
+
+                    // Default options are marked with *
+                    fetch(url, {
+                        method: "GET", // *GET, POST, PUT, DELETE, etc.
+                        //mode: "no-cors", // no-cors, cors, *same-origin
+                        //cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+                        //credentials: "same-origin", // include, *same-origin, omit
+                        //headers: {
+                        //    "Content-Type": "application/json; charset=utf-8",
+                        //},
+                        //redirect: "follow", // manual, *follow, error
+                        //referrer: "no-referrer", // no-referrer, *client
+                        // body: JSON.stringify(data), // body data type must match "Content-Type" header
+                    })
+					.then(function(response) { return response.json(); } )
+					.then(function(data) { this.showOutput("Fetch output: " + data.file ); })
+                    .catch(function(error) { this.showOutput("Fetch error: " + error); });
+
+                    // Fetch output will be written AFTER this, not before (async in action)
+                    this.showOutput("Fetch complete");
+                }
+                else
+                {
+                    this.showOutput("Fetch not supported!");
+                }
+            }
+
+
+            /*
+             EXAMPLE OF A PROMISE
+            */
+            // Promise
+            var myPromise = new Promise(
+                function (resolve, reject) {
+                    // Invoke URL
+                    fetch(url)
+                    .then(function(data) { resolve(data) })
+                    .catch(function(error) { reject(error)});
+                }
+            );
+
+            // Call promise
+            var callPromise = function () {
+                this.showOutput("<br/>About to call promise");
+
+                myPromise
+					.then(function(response) { return response.json(); } )
+					.then(function(data) { this.showOutput("Promise output: " + data.file ); })
+					.catch(function (error) { this.showOutput("Promise error: " + error.message); });
+
+                // Promise output will be written AFTER this, not before (async in action)
+                this.showOutput("Promise called");
+            };
+
+            
+            /*
+             EXAMPLE OF ASYNCH/AWAIT
+            */
+			async function callUrlAsync() {
+				try {
+					// read our JSON 
+					let response = await fetch(url);
+					let data = await response.json();
+
+					/*
+					// Uncomment this to see all properties of the response object
+					for(var propertyName in response) {
+						this.showOutput(propertyName + ": " + response[propertyName]);
+					}
+					*/
+
+					showOutput("Async output: " + data.file);
+                } catch(err) {
+                    // catches errors both in fetch and response.json
+                    this.showOutput("Async error: " + err);
+                }
+
+				return;
+			};
+
+	        var invokeAsync = function () {
+                this.showOutput("<br/>About to invoke async operation");
+
+				callUrlAsync();
+
+                // Async output will be written AFTER this, not before (async in action)
+                this.showOutput("Async operation complete");
+            }
+
+            /*
+             HELPER FUNCTIONS
+            */
+            var showOutput = function (data)
+            {
+                document.getElementById("outputDiv").innerHTML += data + "<br/>";
+            }
+
+            var clearOutput = function ()
+            {
+                document.getElementById("outputDiv").innerHTML = "";
+            }
+        </script>
+    </body>
+</html>
